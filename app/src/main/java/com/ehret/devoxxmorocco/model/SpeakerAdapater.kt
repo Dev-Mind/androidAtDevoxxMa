@@ -5,10 +5,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.ehret.devoxxmorocco.OnSpeakerClickListener
 import com.ehret.devoxxmorocco.R
 
 
-class SpeakerAdapater(val speakers: List<Speaker>): RecyclerView.Adapter<SpeakerAdapater.ViewHolder>(){
+class SpeakerAdapater(val speakers: List<Speaker>, val context: OnSpeakerClickListener): RecyclerView.Adapter<SpeakerAdapater.ViewHolder>(){
 
 
     class ViewHolder(view: ConstraintLayout) : RecyclerView.ViewHolder(view){
@@ -26,8 +27,16 @@ class SpeakerAdapater(val speakers: List<Speaker>): RecyclerView.Adapter<Speaker
         holder.apply {
             name.text = "${speaker.firstName} ${speaker.lastName}"
             country.text = speaker.country
+            itemView.setOnClickListener {
+                context.onSpeakerSelected(speaker.uuid)
+            }
         }
     }
 
     override fun getItemCount()= speakers.size
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        holder.itemView.setOnClickListener(null)
+        super.onViewRecycled(holder)
+    }
 }

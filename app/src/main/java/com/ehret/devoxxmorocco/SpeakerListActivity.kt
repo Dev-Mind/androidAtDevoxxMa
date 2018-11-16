@@ -9,14 +9,22 @@ import com.ehret.devoxxmorocco.model.AppDatabase
 import com.ehret.devoxxmorocco.model.SpeakerAdapater
 import kotlinx.android.synthetic.main.activity_speaker_list.*
 
-class SpeakerListActivity : AppCompatActivity() {
+
+interface OnSpeakerClickListener{
+   fun  onSpeakerSelected(id: String)
+}
+
+class SpeakerListActivity : AppCompatActivity(), OnSpeakerClickListener {
+    override fun onSpeakerSelected(id: String) {
+        startActivity(Intent(baseContext, SpeakerActivity::class.java).putExtra("ID", id))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_speaker_list)
 
         buttonAddSpeaker.setOnClickListener {
-            startActivity(Intent(baseContext, SpeakerActivity::class.java))
+            onSpeakerSelected("")
         }
 
 
@@ -24,7 +32,7 @@ class SpeakerListActivity : AppCompatActivity() {
             setHasFixedSize(true)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             layoutManager = LinearLayoutManager(context)
-            adapter = SpeakerAdapater(AppDatabase.speakerDao.readAll())
+            adapter = SpeakerAdapater(AppDatabase.speakerDao.readAll(), this@SpeakerListActivity)
         }
     }
 }
