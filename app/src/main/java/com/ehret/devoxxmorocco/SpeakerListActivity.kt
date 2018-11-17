@@ -8,13 +8,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ehret.devoxxmorocco.model.AppDatabase
 import com.ehret.devoxxmorocco.model.SpeakerAdapater
 import kotlinx.android.synthetic.main.activity_speaker_list.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 
-interface OnSpeakerClickListener{
-   fun  onSpeakerSelected(id: String)
+interface OnSpeakerClickListener {
+    fun onSpeakerSelected(id: String)
 }
 
-class SpeakerListActivity : AppCompatActivity(), OnSpeakerClickListener {
+class SpeakerListActivity : AppCompatActivity(), OnSpeakerClickListener, CoroutineScope {
+
+    override val coroutineContext: CoroutineContext = Dispatchers.Default
+
     override fun onSpeakerSelected(id: String) {
         startActivity(Intent(baseContext, SpeakerActivity::class.java).putExtra("ID", id))
     }
@@ -29,10 +36,14 @@ class SpeakerListActivity : AppCompatActivity(), OnSpeakerClickListener {
 
 
         speakerList.apply {
+            val speakerDao = AppDatabase.instance(baseContext).speakerDao()
+
             setHasFixedSize(true)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             layoutManager = LinearLayoutManager(context)
-            adapter = SpeakerAdapater(AppDatabase.speakerDao.readAll(), this@SpeakerListActivity)
+            launch {
+                adapter = SpeakerAdapater(speakerDao.readAll(), this@SpeakerListActivity)
+            }
         }
     }
 }
