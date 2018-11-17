@@ -6,7 +6,7 @@ import java.util.*
 
 @Entity(tableName = "speaker")
 data class Speaker(
-    @ColumnInfo  val firstName: String,
+    @ColumnInfo val firstName: String,
     @ColumnInfo val lastName: String,
     @PrimaryKey val uuid: String = UUID.randomUUID().toString(),
     @ColumnInfo val country: String = "MOROCCO"
@@ -14,7 +14,7 @@ data class Speaker(
 
 
 @Dao
-interface SpeakerDao{
+interface SpeakerDao {
 
     @Insert
     fun create(speaker: Speaker)
@@ -33,17 +33,24 @@ interface SpeakerDao{
 }
 
 @Database(entities = arrayOf(Speaker::class), version = 1)
-abstract class AppDatabase:RoomDatabase(){
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun speakerDao(): SpeakerDao
 
     companion object {
-        var INSTANCE:AppDatabase? = null
+        var INSTANCE: AppDatabase? = null
 
-        fun instance(context: Context): AppDatabase {
-            if(INSTANCE == null){
-                INSTANCE = Room.databaseBuilder(context, AppDatabase::class.java, "DevoxxMa3").build()
+        fun instance(context: Context, inMemory: Boolean = false): AppDatabase {
+            if (INSTANCE == null) {
+                if (inMemory) {
+                    INSTANCE = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+                } else {
+                    INSTANCE = Room.databaseBuilder(context, AppDatabase::class.java, "DevoxxMa3").build()
+                }
+            } else if (!INSTANCE!!.isOpen && inMemory) {
+                INSTANCE = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
             }
+
             return INSTANCE!!
         }
     }
