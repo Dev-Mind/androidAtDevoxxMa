@@ -46,4 +46,8 @@ class SpeakerListActivity : AppCompatActivity(), OnSpeakerClickListener, Corouti
             }
         }
     }
+
+    override fun onBackPressed() {
+        startActivity(Intent(baseContext, MainActivity::class.java))
+    }
 }
